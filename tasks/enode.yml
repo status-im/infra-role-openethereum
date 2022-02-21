@@ -1,0 +1,27 @@
+---
+- name: 'Wait for JSON RPC port to respond'
+  wait_for:
+    host: 'localhost'
+    port: '{{ openethereum_rpc_port }}'
+    delay: 5
+    connect_timeout: 10
+    state: drained
+
+- name: 'Query for enode address'
+  uri:
+    url: 'http://localhost:{{ openethereum_rpc_port }}/'
+    method: POST
+    body: {id: 1, method: 'parity_enode', jsonrpc: '2.0'}
+    body_format: json
+    return_content: yes
+  register: node_info
+
+- name: 'Extract enode address'
+  set_fact:
+    openethereum_enode_addr: '{{ node_info.json.result }}'
+
+- name: 'Save enode address'
+  copy:
+    dest: '{{ openethereum_service_path }}/enode'
+    content: '{{ openethereum_enode_addr }}'
+    mode: 0644

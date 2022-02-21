@@ -1,0 +1,40 @@
+---
+- name: Create Consul service definition
+  include_role: name=consul-service
+  vars:
+    consul_config_name: '{{ openethereum_service_name }}'
+    consul_services:
+      - name: '{{ openethereum_service_name }}'
+        tags: '{{ openethereum_consul_tags }}'
+        port: '{{ openethereum_p2p_port }}'
+        address: '{{ ansible_host }}'
+        meta:
+          node_enode: '{{ openethereum_enode_addr }}'
+        checks:
+          - id: '{{ openethereum_service_name }}-status'
+            type: 'tcp'
+            tcp: '127.0.0.1:{{ openethereum_p2p_port }}'
+
+      - name: '{{ openethereum_service_name }}-rpc'
+        tags: '{{ openethereum_consul_tags + ["rpc"] }}'
+        port: '{{ openethereum_rpc_port }}'
+        address: '{{ openethereum_consul_address }}'
+        meta:
+          url: 'http://{{ openethereum_consul_address }}:{{ openethereum_rpc_port }}'
+        checks:
+          - id: '{{ openethereum_service_name }}-rpc-status'
+            type: 'script'
+            script: '{{ openethereum_service_path }}/rpc.sh eth_syncing'
+            timeout: '5s'
+
+      - name: '{{ openethereum_service_name }}-ws'
+        tags: '{{ openethereum_consul_tags + ["websocket"] }}'
+        port: '{{ openethereum_websocket_port }}'
+        address: '{{ openethereum_consul_address }}'
+        meta:
+          url: 'ws://{{ openethereum_consul_address }}:{{ openethereum_websocket_port }}'
+        checks:
+          - id: '{{ openethereum_service_name }}-ws-status'
+            name: 'openethereum WebSocket API'
+            type: 'tcp'
+            tcp: 'localhost:{{ openethereum_websocket_port }}'

@@ -1,0 +1,34 @@
+---
+- name: Create container directories
+  file:
+    path: '{{ item }}'
+    owner: dockremap
+    group: docker
+    state: directory
+  with_items:
+    - '{{ openethereum_service_path }}'
+    - '{{ openethereum_cont_vol }}'
+
+- name: Create compose file
+  template:
+    src: 'docker-compose.yml.j2'
+    dest: '{{ openethereum_compose_path }}'
+    owner: 'dockremap'
+    group: 'docker'
+    mode: 0640
+
+# Take into account additional docker-compose.yml files.
+- name: Find all Docker Compose files
+  find:
+    paths: '{{ openethereum_service_path }}'
+    patterns: 'docker-compose.yml'
+    recurse: false
+
+- name: Create containers
+  docker_compose:
+    project_src: '{{ openethereum_service_path }}'
+    pull: true
+    build: false
+    state: '{{ compose_state }}'
+    restarted: '{{ compose_restart }}'
+    recreate: '{{ compose_recreate | default("smart") }}'

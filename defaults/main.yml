@@ -1,0 +1,65 @@
+---
+openethereum_service_name: 'openeth'
+openethereum_service_path: '/docker/{{ openethereum_service_name }}'
+openethereum_compose_path: '{{ openethereum_service_path }}/docker-compose.yml'
+
+# Docker Container
+openethereum_cont_name: '{{ openethereum_service_name }}-node'
+openethereum_cont_vol: '{{ openethereum_service_path }}/node'
+openethereum_cont_tag: 'v3.3.4'
+openethereum_cont_image: 'openethereum/openethereum:{{ openethereum_cont_tag }}'
+openethereum_cont_mem_ratio: 0.6
+openethereum_cont_mem_limit: |-
+  {{ (ansible_memtotal_mb * openethereum_cont_mem_ratio|float) | int }}
+
+# Config
+openethereum_chain: 'foundation' # Ethereum  Miannet
+openethereum_mode: 'active'
+openethereum_pruning: 'auto'
+openethereum_warp_enabled: false
+openethereum_identity: '{{ openethereum_service_name }}'
+openethereum_public_ip: '{{ ansible_host }}'
+openethereum_max_peers: 300
+openethereum_cache_size_ratio: 0.2
+openethereum_cache_size: |-
+  {{ (ansible_memtotal_mb * openethereum_cache_size_ratio|float) | int }}
+
+# P2P
+openethereum_p2p_port: 30303
+
+# RPC
+openethereum_rpc_enabled: true
+openethereum_rpc_port: 8545
+openethereum_rpc_addr: '127.0.0.1'
+openethereum_rpc_cors: 'none'
+openethereum_rpc_apis: [web3, eth, pubsub, net, parity, parity_pubsub, traces]
+openethereum_rpc_hosts: ['127.0.0.1', 'localhost', '{{ hostname }}.wg']
+
+# WebSocket
+openethereum_websocket_enabled: true
+openethereum_websocket_port: 8546
+openethereum_websocket_addr: '127.0.0.1'
+openethereum_websocket_apis: [web3, eth, pubsub, net, parity, parity_pubsub, traces]
+openethereum_websocket_origins: ['none']
+openethereum_websocket_hosts: ['127.0.0.1', 'localhost', '{{ hostname }}.wg']
+
+# Metrics
+openethereum_metrics_enabled: true
+openethereum_metrics_port: 3000
+openethereum_metrics_addr: '0.0.0.0'
+
+# Consul config
+openethereum_consul_address: '{{ ansible_local.wireguard.address }}'
+openethereum_consul_default_tags:
+  - 'openethereum'
+  - '{{ env }}.{{ stage }}'
+  - '{{ openethereum_chain }}'
+openethereum_consul_extra_tags: []
+openethereum_consul_tags: |-
+  {{ openethereum_consul_default_tags
+   + openethereum_consul_extra_tags }}
+
+# general container management
+compose_recreate: 'smart'
+compose_state: 'present'
+compose_restart: false

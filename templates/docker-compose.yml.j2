@@ -1,0 +1,57 @@
+---
+version: '3.7'
+services:
+  node:
+    container_name: '{{ openethereum_cont_name }}'
+    image: '{{ openethereum_cont_image }}'
+    user: root
+    restart: 'always'
+    deploy:
+      resources:
+        limits:
+          memory: '{{ openethereum_cont_mem_limit }}m'
+    ports:
+      - '{{ openethereum_p2p_port }}:{{ openethereum_p2p_port }}/tcp'
+      - '{{ openethereum_p2p_port }}:{{ openethereum_p2p_port }}/udp'
+      - '{{ openethereum_rpc_addr }}:{{ openethereum_rpc_port }}:{{ openethereum_rpc_port }}/tcp'
+      - '{{ openethereum_metrics_addr }}:{{ openethereum_metrics_port }}:{{ openethereum_metrics_port }}/tcp'
+      - '{{ openethereum_websocket_addr }}:{{ openethereum_websocket_port }}:{{ openethereum_websocket_port }}/tcp'
+    volumes:
+      - '{{ openethereum_cont_vol }}/data:/data:rw'
+    command: |
+      --base-path=/data
+      --chain='{{ openethereum_chain }}'
+      --mode='{{ openethereum_mode }}'
+      --pruning='{{ openethereum_pruning }}'
+      --identity='{{ openethereum_identity }}'
+      --max-peers='{{ openethereum_max_peers }}'
+      --cache-size='{{ openethereum_cache_size }}'
+      --interface=all
+      --port='{{ openethereum_p2p_port }}'
+      --nat=extip:{{ openethereum_public_ip }}
+{% if not openethereum_warp_enabled %}
+      --no-warp
+{% endif %}
+{% if openethereum_rpc_enabled %}
+      --jsonrpc-interface=all
+      --jsonrpc-port='{{ openethereum_rpc_port }}'
+      --jsonrpc-cors='{{ openethereum_rpc_cors }}'
+      --jsonrpc-hosts='{{ openethereum_rpc_hosts | join(",") }}'
+      --jsonrpc-apis='{{ openethereum_rpc_apis | join(",") }}'
+{% else %}
+      --no-jsonrpc
+{% endif %}
+{% if openethereum_websocket_enabled %}
+      --ws-interface=all
+      --ws-port='{{ openethereum_websocket_port }}'
+      --ws-apis='{{ openethereum_websocket_apis | join(",") }}'
+      --ws-origins='{{ openethereum_websocket_origins | join(",") }}'
+      --ws-hosts='{{ openethereum_websocket_hosts | join(",") }}'
+{% else %}
+      --no-ws
+{% endif %}
+{% if openethereum_metrics_enabled %}
+      --metrics
+      --metrics-interface=all
+      --metrics-port='{{ openethereum_metrics_port }}'
+{% endif %}
