@@ -6,7 +6,7 @@ openethereum_compose_path: '{{ openethereum_service_path }}/docker-compose.yml'
 # Docker Container
 openethereum_cont_name: '{{ openethereum_service_name }}-node'
 openethereum_cont_vol: '{{ openethereum_service_path }}/node'
-openethereum_cont_tag: 'v3.3.4'
+openethereum_cont_tag: 'v3.3.5'
 openethereum_cont_image: 'openethereum/openethereum:{{ openethereum_cont_tag }}'
 openethereum_cont_mem_ratio: 0.6
 openethereum_cont_mem_limit: |-
