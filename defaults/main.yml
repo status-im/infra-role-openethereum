@@ -13,7 +13,10 @@ openethereum_cont_mem_limit: |-
   {{ (ansible_memtotal_mb * openethereum_cont_mem_ratio|float) | int }}
 
 # Config
-openethereum_chain: 'foundation' # Ethereum  Miannet
+openethereum_chain: 'foundation' # Ethereum Miannet
+openethereum_chain_to_network_map:
+  foundation: 'mainnet'
+openethereum_network: '{{ openethereum_chain_to_network_map[openethereum_chain] }}'
 openethereum_mode: 'active'
 openethereum_pruning: 'auto'
 openethereum_warp_enabled: false
@@ -49,7 +52,7 @@ openethereum_metrics_port: 3000
 openethereum_metrics_addr: '0.0.0.0'
 
 # Consul config
-openethereum_consul_service_name: 'openeth'
+openethereum_consul_service_name: 'openeth-{{ openethereum_network }}'
 openethereum_consul_address: '{{ ansible_local.wireguard.address }}'
 openethereum_consul_default_tags:
   - 'openethereum'
