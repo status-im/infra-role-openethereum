@@ -49,6 +49,7 @@ openethereum_metrics_port: 3000
 openethereum_metrics_addr: '0.0.0.0'
 
 # Consul config
+openethereum_consul_service_name: 'openeth'
 openethereum_consul_address: '{{ ansible_local.wireguard.address }}'
 openethereum_consul_default_tags:
   - 'openethereum'

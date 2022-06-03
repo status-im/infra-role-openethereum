@@ -4,7 +4,8 @@
   vars:
     consul_config_name: '{{ openethereum_service_name }}'
     consul_services:
-      - name: '{{ openethereum_service_name }}'
+      - id:   '{{ openethereum_service_name }}'
+        name: '{{ openethereum_consul_service_name }}'
         tags: '{{ openethereum_consul_tags }}'
         port: '{{ openethereum_p2p_port }}'
         address: '{{ ansible_host }}'
@@ -15,7 +16,8 @@
             type: 'tcp'
             tcp: '127.0.0.1:{{ openethereum_p2p_port }}'
 
-      - name: '{{ openethereum_service_name }}-rpc'
+      - id:   '{{ openethereum_service_name }}-rpc'
+        name: '{{ openethereum_consul_service_name }}-rpc'
         tags: '{{ openethereum_consul_tags + ["rpc"] }}'
         port: '{{ openethereum_rpc_port }}'
         address: '{{ openethereum_consul_address }}'
@@ -27,7 +29,8 @@
             script: '{{ openethereum_service_path }}/rpc.sh eth_syncing'
             timeout: '5s'
 
-      - name: '{{ openethereum_service_name }}-ws'
+      - id:   '{{ openethereum_service_name }}-ws'
+        name: '{{ openethereum_consul_service_name }}-ws'
         tags: '{{ openethereum_consul_tags + ["websocket"] }}'
         port: '{{ openethereum_websocket_port }}'
         address: '{{ openethereum_consul_address }}'
@@ -38,3 +41,14 @@
             name: 'openethereum WebSocket API'
             type: 'tcp'
             tcp: 'localhost:{{ openethereum_websocket_port }}'
+
+      - id:   '{{ openethereum_service_name }}-metrics'
+        name: '{{ openethereum_consul_service_name }}-metrics'
+        tags: '{{ openethereum_consul_tags + ["metrics"] }}'
+        port: '{{ openethereum_metrics_port }}'
+        address: '{{ openethereum_consul_address }}'
+        checks:
+          - id: '{{ openethereum_service_name }}-metrics'
+            name: 'openethereum metrics API'
+            type: 'tcp'
+            tcp: 'localhost:{{ openethereum_metrics_port }}'
