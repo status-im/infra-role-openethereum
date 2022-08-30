@@ -1,3 +1,5 @@
+# WARNING: OpenEthereum has been discontinued.
+
 # Description
 
 This role configures [OpenEthereum](https://github.com/openethereum/openethereum) - an Eth1 client written in Rust.
